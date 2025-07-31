@@ -1,3 +1,5 @@
 .claude
 .structurizr
 docs/diagrams/structurizr/*.json
+apps/flight-context-api/build/
+apps/flight-context-api/.gradle
