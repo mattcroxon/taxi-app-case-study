@@ -19,7 +19,13 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
             
             # Backend Services
             backendServices = container "Priority Pass Backend" "Core Priority Pass services with flight intelligence and integration capabilities" "Backend Services"
-            flightContextService = container "Flight Context Service" "Processes flight data to calculate optimal departure times and recommendations" "Service"
+            flightContextService = container "Flight Context Service" "Processes flight data to calculate optimal departure times" "Service" {
+                # Core Components
+                flightDataIngestion = component "Flight Data Ingestion" "Collects and validates real-time flight information" "Data Ingestion"
+                timingCalculator = component "Timing Calculator" "Calculates optimal departure times based on flight schedules" "Calculation Engine"
+                cacheManager = component "Cache Manager" "Caches flight data and timing calculations" "Cache Layer"
+                flightContextAPI = component "Flight Context API" "RESTful API exposing flight timing data" "API"
+            }
             uberIntegrationService = container "Uber Integration Service" "Handles Uber API calls, ride orchestration, and booking management" "Service"
             deepLinkHandler = container "Deep Link Handler" "Manages seamless handoffs to/from Uber app with context preservation" "Service"
             
@@ -51,8 +57,15 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
         rideOrchestrationAPI -> contextPreservationService "Maintains booking context" "HTTPS/REST"
         rideOrchestrationAPI -> notificationHub "Sends status updates and notifications" "HTTPS/REST"
         
+        # Flight Context Service Component Relationships
+        flightDataIngestion -> flightDataSystem "Fetches real-time flight data" "HTTPS/REST"
+        flightDataIngestion -> timingCalculator "Sends validated flight data" "Internal"
+        timingCalculator -> cacheManager "Stores timing calculations" "Internal"
+        cacheManager -> flightContextAPI "Provides cached data" "Internal"
+        flightContextAPI -> backendServices "Exposes flight timing data" "HTTPS/REST"
+        flightContextAPI -> rideOrchestrationAPI "Provides timing calculations" "HTTPS/REST"
+
         # External System Relationships
-        flightContextService -> flightDataSystem "Fetches real-time flight information" "HTTPS/REST"
         notificationHub -> mobileApp "Pushes real-time updates" "Push Notifications"
         uberAPI -> notificationHub "Sends ride status updates" "Webhooks"
         uberApp -> uberAPI "Manages ride lifecycle and driver communication"
@@ -87,6 +100,21 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
             title "Priority Pass Uber Integration - Container Diagram"
         }
 
+        component flightContextService "FlightContextComponents" {
+            include *
+            animation {
+                flightDataIngestion
+                timingCalculator
+                cacheManager
+                flightContextAPI
+                flightDataSystem
+                backendServices rideOrchestrationAPI
+            }
+            autoLayout
+            description "Component diagram showing the simplified internal structure of the Flight Context Service"
+            title "Flight Context Service - Component Diagram"
+        }
+
         styles {
             element "Person" {
                 color #ffffff
@@ -116,6 +144,26 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
             }
             element "API Gateway" {
                 background #e65100
+                color #ffffff
+            }
+            element "Data Ingestion" {
+                background #795548
+                color #ffffff
+            }
+            element "Processing Engine" {
+                background #607d8b
+                color #ffffff
+            }
+            element "Calculation Engine" {
+                background #455a64
+                color #ffffff
+            }
+            element "Cache Layer" {
+                background #ff9800
+                color #ffffff
+            }
+            element "API" {
+                background #9c27b0
                 color #ffffff
             }
             relationship "Relationship" {

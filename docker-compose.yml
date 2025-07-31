@@ -6,5 +6,5 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./docs/diagrams:/usr/local/structurizr
+      - ./docs/diagrams/structurizr:/usr/local/structurizr
     restart: always
