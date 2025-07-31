@@ -14,9 +14,7 @@ decisions, and clear communication.
 
 ## What we're evaluating 
 **Architecture & Design**: Use of the C4 model to communicate system structure and responsibilities.
-Technical Thinking: How you
-break down the pro
-blem and design scalable, extensible components.
+Technical Thinking: How you break down the problem and design scalable, extensible components.
 
 **Client Focus**: How clearly and effectively you communicate your ideas, assumptions, and trade-offs especially in a way that would make sense to both technical and non-technical stakeholders.
 
