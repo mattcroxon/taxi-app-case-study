@@ -1,0 +1,796 @@
+{
+  "configuration" : { },
+  "description" : "Airport transportation integration between Priority Pass and Uber services",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedAgent" : "structurizr-ui",
+  "lastModifiedDate" : "2025-07-31T15:20:32Z",
+  "model" : {
+    "people" : [ {
+      "description" : "Airport passenger using Priority Pass benefits and needing transportation",
+      "id" : "1",
+      "location" : "Unspecified",
+      "name" : "Traveler",
+      "properties" : {
+        "structurizr.dsl.identifier" : "traveler"
+      },
+      "relationships" : [ {
+        "description" : "Views flight details, requests rides, receives recommendations",
+        "destinationId" : "7",
+        "id" : "19",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Views flight details, requests rides, receives recommendations",
+        "destinationId" : "6",
+        "id" : "20",
+        "linkedRelationshipId" : "19",
+        "sourceId" : "1"
+      }, {
+        "description" : "Completes ride booking and tracks journey",
+        "destinationId" : "2",
+        "id" : "21",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Person,User"
+    } ],
+    "softwareSystems" : [ {
+      "description" : "Native Taxi application for ride booking and management",
+      "documentation" : { },
+      "id" : "2",
+      "location" : "Unspecified",
+      "name" : "TaxiService  Mobile App",
+      "properties" : {
+        "structurizr.dsl.identifier" : "taxiapp"
+      },
+      "relationships" : [ {
+        "description" : "Manages ride lifecycle and driver communication",
+        "destinationId" : "3",
+        "id" : "48",
+        "sourceId" : "2",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Software System,External System"
+    }, {
+      "description" : "Taxi ride request, pricing, and management APIs",
+      "documentation" : { },
+      "id" : "3",
+      "location" : "Unspecified",
+      "name" : "TaxiSerivce API Platform",
+      "properties" : {
+        "structurizr.dsl.identifier" : "taxiapi"
+      },
+      "relationships" : [ {
+        "description" : "Sends ride status updates",
+        "destinationId" : "18",
+        "id" : "46",
+        "sourceId" : "3",
+        "tags" : "Relationship",
+        "technology" : "Webhooks"
+      }, {
+        "description" : "Sends ride status updates",
+        "destinationId" : "6",
+        "id" : "47",
+        "linkedRelationshipId" : "46",
+        "sourceId" : "3",
+        "technology" : "Webhooks"
+      } ],
+      "tags" : "Element,Software System,External System"
+    }, {
+      "description" : "Real-time flight information, delays, and gate updates",
+      "documentation" : { },
+      "id" : "4",
+      "location" : "Unspecified",
+      "name" : "Flight Data Provider",
+      "properties" : {
+        "structurizr.dsl.identifier" : "flightdatasystem"
+      },
+      "tags" : "Element,Software System,External System"
+    }, {
+      "description" : "Secure payment processing for ride bookings",
+      "documentation" : { },
+      "id" : "5",
+      "location" : "Unspecified",
+      "name" : "Payment Gateway",
+      "properties" : {
+        "structurizr.dsl.identifier" : "paymentgateway"
+      },
+      "tags" : "Element,Software System,External System"
+    }, {
+      "containers" : [ {
+        "description" : "Enhanced mobile application with flight context and Uber integration capabilities",
+        "documentation" : { },
+        "id" : "7",
+        "name" : "Priority Pass Mobile App",
+        "properties" : {
+          "structurizr.dsl.identifier" : "mobileapp"
+        },
+        "relationships" : [ {
+          "description" : "Communicates with core services",
+          "destinationId" : "8",
+          "id" : "22",
+          "sourceId" : "7",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        }, {
+          "description" : "Requests rides and booking services",
+          "destinationId" : "16",
+          "id" : "23",
+          "sourceId" : "7",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        }, {
+          "description" : "Deep links with booking context",
+          "destinationId" : "2",
+          "id" : "24",
+          "sourceId" : "7",
+          "tags" : "Relationship",
+          "technology" : "Deep Link Protocol"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Mobile App"
+      }, {
+        "description" : "Core Priority Pass services with flight intelligence and integration capabilities",
+        "documentation" : { },
+        "id" : "8",
+        "name" : "Priority Pass Backend",
+        "properties" : {
+          "structurizr.dsl.identifier" : "backendservices"
+        },
+        "relationships" : [ {
+          "description" : "Retrieves flight timing intelligence",
+          "destinationId" : "9",
+          "id" : "26",
+          "sourceId" : "8",
+          "tags" : "Relationship",
+          "technology" : "Internal API"
+        }, {
+          "description" : "Accesses Uber integration capabilities",
+          "destinationId" : "14",
+          "id" : "27",
+          "sourceId" : "8",
+          "tags" : "Relationship",
+          "technology" : "Internal API"
+        }, {
+          "description" : "Manages app transition context",
+          "destinationId" : "15",
+          "id" : "28",
+          "sourceId" : "8",
+          "tags" : "Relationship",
+          "technology" : "Internal API"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Backend Services"
+      }, {
+        "components" : [ {
+          "description" : "Collects and validates real-time flight information",
+          "documentation" : { },
+          "id" : "10",
+          "name" : "Flight Data Ingestion",
+          "properties" : {
+            "structurizr.dsl.identifier" : "flightdataingestion"
+          },
+          "relationships" : [ {
+            "description" : "Fetches real-time flight data",
+            "destinationId" : "4",
+            "id" : "36",
+            "sourceId" : "10",
+            "tags" : "Relationship",
+            "technology" : "HTTPS/REST"
+          }, {
+            "description" : "Sends validated flight data",
+            "destinationId" : "11",
+            "id" : "39",
+            "sourceId" : "10",
+            "tags" : "Relationship",
+            "technology" : "Internal"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "Data Ingestion"
+        }, {
+          "description" : "Calculates optimal departure times based on flight schedules",
+          "documentation" : { },
+          "id" : "11",
+          "name" : "Timing Calculator",
+          "properties" : {
+            "structurizr.dsl.identifier" : "timingcalculator"
+          },
+          "relationships" : [ {
+            "description" : "Stores timing calculations",
+            "destinationId" : "12",
+            "id" : "40",
+            "sourceId" : "11",
+            "tags" : "Relationship",
+            "technology" : "Internal"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "Calculation Engine"
+        }, {
+          "description" : "Caches flight data and timing calculations",
+          "documentation" : { },
+          "id" : "12",
+          "name" : "Cache Manager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "cachemanager"
+          },
+          "relationships" : [ {
+            "description" : "Provides cached data",
+            "destinationId" : "13",
+            "id" : "41",
+            "sourceId" : "12",
+            "tags" : "Relationship",
+            "technology" : "Internal"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "Cache Layer"
+        }, {
+          "description" : "RESTful API exposing flight timing data",
+          "documentation" : { },
+          "id" : "13",
+          "name" : "Flight Context API",
+          "properties" : {
+            "structurizr.dsl.identifier" : "flightcontextapi"
+          },
+          "relationships" : [ {
+            "description" : "Exposes flight timing data",
+            "destinationId" : "8",
+            "id" : "42",
+            "sourceId" : "13",
+            "tags" : "Relationship",
+            "technology" : "HTTPS/REST"
+          }, {
+            "description" : "Provides timing calculations",
+            "destinationId" : "16",
+            "id" : "44",
+            "sourceId" : "13",
+            "tags" : "Relationship",
+            "technology" : "HTTPS/REST"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "API"
+        } ],
+        "description" : "Processes flight data to calculate optimal departure times",
+        "documentation" : { },
+        "id" : "9",
+        "name" : "Flight Context Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "flightcontextservice"
+        },
+        "relationships" : [ {
+          "description" : "Provides optimal timing recommendations",
+          "destinationId" : "16",
+          "id" : "29",
+          "sourceId" : "9",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        }, {
+          "description" : "Fetches real-time flight data",
+          "destinationId" : "4",
+          "id" : "37",
+          "linkedRelationshipId" : "36",
+          "sourceId" : "9",
+          "technology" : "HTTPS/REST"
+        }, {
+          "description" : "Exposes flight timing data",
+          "destinationId" : "8",
+          "id" : "43",
+          "linkedRelationshipId" : "42",
+          "sourceId" : "9",
+          "technology" : "HTTPS/REST"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Service"
+      }, {
+        "description" : "Handles Uber API calls, ride orchestration, and booking management",
+        "documentation" : { },
+        "id" : "14",
+        "name" : "Uber Integration Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "taxiintegrationservice"
+        },
+        "relationships" : [ {
+          "description" : "Requests estimates, creates bookings, retrieves status",
+          "destinationId" : "3",
+          "id" : "30",
+          "sourceId" : "14",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST API"
+        }, {
+          "description" : "Coordinates ride booking lifecycle",
+          "destinationId" : "16",
+          "id" : "32",
+          "sourceId" : "14",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Service"
+      }, {
+        "description" : "Manages seamless handoffs to/from Uber app with context preservation",
+        "documentation" : { },
+        "id" : "15",
+        "name" : "Deep Link Handler",
+        "properties" : {
+          "structurizr.dsl.identifier" : "deeplinkhandler"
+        },
+        "relationships" : [ {
+          "description" : "Preserves user state across transitions",
+          "destinationId" : "17",
+          "id" : "33",
+          "sourceId" : "15",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Service"
+      }, {
+        "description" : "Manages ride booking lifecycle and coordinates between systems",
+        "documentation" : { },
+        "id" : "16",
+        "name" : "Ride Orchestration API",
+        "properties" : {
+          "structurizr.dsl.identifier" : "rideorchestrationapi"
+        },
+        "relationships" : [ {
+          "description" : "Maintains booking context",
+          "destinationId" : "17",
+          "id" : "34",
+          "sourceId" : "16",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        }, {
+          "description" : "Sends status updates and notifications",
+          "destinationId" : "18",
+          "id" : "35",
+          "sourceId" : "16",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        }, {
+          "description" : "Processes ride payments",
+          "destinationId" : "5",
+          "id" : "49",
+          "sourceId" : "16",
+          "tags" : "Relationship",
+          "technology" : "HTTPS/REST"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "API Gateway"
+      }, {
+        "description" : "Maintains user state and booking context across app transitions",
+        "documentation" : { },
+        "id" : "17",
+        "name" : "Context Preservation Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "contextpreservationservice"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Service"
+      }, {
+        "description" : "Provides real-time updates and status notifications across platforms",
+        "documentation" : { },
+        "id" : "18",
+        "name" : "Notification Hub",
+        "properties" : {
+          "structurizr.dsl.identifier" : "notificationhub"
+        },
+        "relationships" : [ {
+          "description" : "Pushes real-time updates",
+          "destinationId" : "7",
+          "id" : "45",
+          "sourceId" : "18",
+          "tags" : "Relationship",
+          "technology" : "Push Notifications"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Service"
+      } ],
+      "description" : "Provides flight-aware transportation recommendations and seamless booking experience",
+      "documentation" : { },
+      "id" : "6",
+      "location" : "Unspecified",
+      "name" : "Priority Pass Integration Platform",
+      "properties" : {
+        "structurizr.dsl.identifier" : "prioritypasssystem"
+      },
+      "relationships" : [ {
+        "description" : "Deep links with booking context",
+        "destinationId" : "2",
+        "id" : "25",
+        "linkedRelationshipId" : "24",
+        "sourceId" : "6",
+        "technology" : "Deep Link Protocol"
+      }, {
+        "description" : "Requests estimates, creates bookings, retrieves status",
+        "destinationId" : "3",
+        "id" : "31",
+        "linkedRelationshipId" : "30",
+        "sourceId" : "6",
+        "technology" : "HTTPS/REST API"
+      }, {
+        "description" : "Fetches real-time flight data",
+        "destinationId" : "4",
+        "id" : "38",
+        "linkedRelationshipId" : "36",
+        "sourceId" : "6",
+        "technology" : "HTTPS/REST"
+      }, {
+        "description" : "Processes ride payments",
+        "destinationId" : "5",
+        "id" : "50",
+        "linkedRelationshipId" : "49",
+        "sourceId" : "6",
+        "technology" : "HTTPS/REST"
+      } ],
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Priority Pass Uber Integration",
+  "properties" : {
+    "structurizr.dsl" : "d29ya3NwYWNlICJQcmlvcml0eSBQYXNzIFViZXIgSW50ZWdyYXRpb24iICJBaXJwb3J0IHRyYW5zcG9ydGF0aW9uIGludGVncmF0aW9uIGJldHdlZW4gUHJpb3JpdHkgUGFzcyBhbmQgVWJlciBzZXJ2aWNlcyIgewoKICAgIG1vZGVsIHsKICAgICAgICAjIFVzZXJzCiAgICAgICAgdHJhdmVsZXIgPSBwZXJzb24gIlRyYXZlbGVyIiAiQWlycG9ydCBwYXNzZW5nZXIgdXNpbmcgUHJpb3JpdHkgUGFzcyBiZW5lZml0cyBhbmQgbmVlZGluZyB0cmFuc3BvcnRhdGlvbiIgIlVzZXIiCiAgICAgICAgCiAgICAgICAgIyBFeHRlcm5hbCBTeXN0ZW1zCiAgICAgICAgdGF4aUFwcCA9IHNvZnR3YXJlU3lzdGVtICJUYXhpU2VydmljZSAgTW9iaWxlIEFwcCIgIk5hdGl2ZSBUYXhpIGFwcGxpY2F0aW9uIGZvciByaWRlIGJvb2tpbmcgYW5kIG1hbmFnZW1lbnQiICJFeHRlcm5hbCBTeXN0ZW0iCiAgICAgICAgdGF4aUFwaSA9IHNvZnR3YXJlU3lzdGVtICJUYXhpU2VyaXZjZSBBUEkgUGxhdGZvcm0iICJUYXhpIHJpZGUgcmVxdWVzdCwgcHJpY2luZywgYW5kIG1hbmFnZW1lbnQgQVBJcyIgIkV4dGVybmFsIFN5c3RlbSIKICAgICAgICBmbGlnaHREYXRhU3lzdGVtID0gc29mdHdhcmVTeXN0ZW0gIkZsaWdodCBEYXRhIFByb3ZpZGVyIiAiUmVhbC10aW1lIGZsaWdodCBpbmZvcm1hdGlvbiwgZGVsYXlzLCBhbmQgZ2F0ZSB1cGRhdGVzIiAiRXh0ZXJuYWwgU3lzdGVtIgogICAgICAgIHBheW1lbnRHYXRld2F5ID0gc29mdHdhcmVTeXN0ZW0gIlBheW1lbnQgR2F0ZXdheSIgIlNlY3VyZSBwYXltZW50IHByb2Nlc3NpbmcgZm9yIHJpZGUgYm9va2luZ3MiICJFeHRlcm5hbCBTeXN0ZW0iCiAgICAgICAgCiAgICAgICAgIyBDb3JlIFN5c3RlbQogICAgICAgIHByaW9yaXR5UGFzc1N5c3RlbSA9IHNvZnR3YXJlU3lzdGVtICJQcmlvcml0eSBQYXNzIEludGVncmF0aW9uIFBsYXRmb3JtIiAiRW5oYW5jZWQgUHJpb3JpdHkgUGFzcyBzeXN0ZW0gd2l0aCBpbnRlbGxpZ2VudCBVYmVyIGludGVncmF0aW9uIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQcm92aWRlcyBmbGlnaHQtYXdhcmUgdHJhbnNwb3J0YXRpb24gcmVjb21tZW5kYXRpb25zIGFuZCBzZWFtbGVzcyBib29raW5nIGV4cGVyaWVuY2UiCiAgICAgICAgICAgIAogICAgICAgICAgICAjIE1vYmlsZSBBcHBsaWNhdGlvbgogICAgICAgICAgICBtb2JpbGVBcHAgPSBjb250YWluZXIgIlByaW9yaXR5IFBhc3MgTW9iaWxlIEFwcCIgIkVuaGFuY2VkIG1vYmlsZSBhcHBsaWNhdGlvbiB3aXRoIGZsaWdodCBjb250ZXh0IGFuZCBVYmVyIGludGVncmF0aW9uIGNhcGFiaWxpdGllcyIgIk1vYmlsZSBBcHAiCiAgICAgICAgICAgIAogICAgICAgICAgICAjIEJhY2tlbmQgU2VydmljZXMKICAgICAgICAgICAgYmFja2VuZFNlcnZpY2VzID0gY29udGFpbmVyICJQcmlvcml0eSBQYXNzIEJhY2tlbmQiICJDb3JlIFByaW9yaXR5IFBhc3Mgc2VydmljZXMgd2l0aCBmbGlnaHQgaW50ZWxsaWdlbmNlIGFuZCBpbnRlZ3JhdGlvbiBjYXBhYmlsaXRpZXMiICJCYWNrZW5kIFNlcnZpY2VzIgogICAgICAgICAgICBmbGlnaHRDb250ZXh0U2VydmljZSA9IGNvbnRhaW5lciAiRmxpZ2h0IENvbnRleHQgU2VydmljZSIgIlByb2Nlc3NlcyBmbGlnaHQgZGF0YSB0byBjYWxjdWxhdGUgb3B0aW1hbCBkZXBhcnR1cmUgdGltZXMiICJTZXJ2aWNlIiB7CiAgICAgICAgICAgICAgICAjIENvcmUgQ29tcG9uZW50cwogICAgICAgICAgICAgICAgZmxpZ2h0RGF0YUluZ2VzdGlvbiA9IGNvbXBvbmVudCAiRmxpZ2h0IERhdGEgSW5nZXN0aW9uIiAiQ29sbGVjdHMgYW5kIHZhbGlkYXRlcyByZWFsLXRpbWUgZmxpZ2h0IGluZm9ybWF0aW9uIiAiRGF0YSBJbmdlc3Rpb24iCiAgICAgICAgICAgICAgICB0aW1pbmdDYWxjdWxhdG9yID0gY29tcG9uZW50ICJUaW1pbmcgQ2FsY3VsYXRvciIgIkNhbGN1bGF0ZXMgb3B0aW1hbCBkZXBhcnR1cmUgdGltZXMgYmFzZWQgb24gZmxpZ2h0IHNjaGVkdWxlcyIgIkNhbGN1bGF0aW9uIEVuZ2luZSIKICAgICAgICAgICAgICAgIGNhY2hlTWFuYWdlciA9IGNvbXBvbmVudCAiQ2FjaGUgTWFuYWdlciIgIkNhY2hlcyBmbGlnaHQgZGF0YSBhbmQgdGltaW5nIGNhbGN1bGF0aW9ucyIgIkNhY2hlIExheWVyIgogICAgICAgICAgICAgICAgZmxpZ2h0Q29udGV4dEFQSSA9IGNvbXBvbmVudCAiRmxpZ2h0IENvbnRleHQgQVBJIiAiUkVTVGZ1bCBBUEkgZXhwb3NpbmcgZmxpZ2h0IHRpbWluZyBkYXRhIiAiQVBJIgogICAgICAgICAgICB9CiAgICAgICAgICAgIHRheGlJbnRlZ3JhdGlvblNlcnZpY2UgPSBjb250YWluZXIgIlViZXIgSW50ZWdyYXRpb24gU2VydmljZSIgIkhhbmRsZXMgVWJlciBBUEkgY2FsbHMsIHJpZGUgb3JjaGVzdHJhdGlvbiwgYW5kIGJvb2tpbmcgbWFuYWdlbWVudCIgIlNlcnZpY2UiCiAgICAgICAgICAgIGRlZXBMaW5rSGFuZGxlciA9IGNvbnRhaW5lciAiRGVlcCBMaW5rIEhhbmRsZXIiICJNYW5hZ2VzIHNlYW1sZXNzIGhhbmRvZmZzIHRvL2Zyb20gVWJlciBhcHAgd2l0aCBjb250ZXh0IHByZXNlcnZhdGlvbiIgIlNlcnZpY2UiCiAgICAgICAgICAgIAogICAgICAgICAgICAjIEludGVncmF0aW9uIExheWVyCiAgICAgICAgICAgIHJpZGVPcmNoZXN0cmF0aW9uQVBJID0gY29udGFpbmVyICJSaWRlIE9yY2hlc3RyYXRpb24gQVBJIiAiTWFuYWdlcyByaWRlIGJvb2tpbmcgbGlmZWN5Y2xlIGFuZCBjb29yZGluYXRlcyBiZXR3ZWVuIHN5c3RlbXMiICJBUEkgR2F0ZXdheSIKICAgICAgICAgICAgY29udGV4dFByZXNlcnZhdGlvblNlcnZpY2UgPSBjb250YWluZXIgIkNvbnRleHQgUHJlc2VydmF0aW9uIFNlcnZpY2UiICJNYWludGFpbnMgdXNlciBzdGF0ZSBhbmQgYm9va2luZyBjb250ZXh0IGFjcm9zcyBhcHAgdHJhbnNpdGlvbnMiICJTZXJ2aWNlIgogICAgICAgICAgICBub3RpZmljYXRpb25IdWIgPSBjb250YWluZXIgIk5vdGlmaWNhdGlvbiBIdWIiICJQcm92aWRlcyByZWFsLXRpbWUgdXBkYXRlcyBhbmQgc3RhdHVzIG5vdGlmaWNhdGlvbnMgYWNyb3NzIHBsYXRmb3JtcyIgIlNlcnZpY2UiCiAgICAgICAgfQogICAgICAgIAogICAgICAgICMgVXNlciBSZWxhdGlvbnNoaXBzCiAgICAgICAgdHJhdmVsZXIgLT4gbW9iaWxlQXBwICJWaWV3cyBmbGlnaHQgZGV0YWlscywgcmVxdWVzdHMgcmlkZXMsIHJlY2VpdmVzIHJlY29tbWVuZGF0aW9ucyIKICAgICAgICB0cmF2ZWxlciAtPiB0YXhpQXBwICJDb21wbGV0ZXMgcmlkZSBib29raW5nIGFuZCB0cmFja3Mgam91cm5leSIKICAgICAgICAKICAgICAgICAjIE1vYmlsZSBBcHAgUmVsYXRpb25zaGlwcwogICAgICAgIG1vYmlsZUFwcCAtPiBiYWNrZW5kU2VydmljZXMgIkNvbW11bmljYXRlcyB3aXRoIGNvcmUgc2VydmljZXMiICJIVFRQUy9SRVNUIgogICAgICAgIG1vYmlsZUFwcCAtPiByaWRlT3JjaGVzdHJhdGlvbkFQSSAiUmVxdWVzdHMgcmlkZXMgYW5kIGJvb2tpbmcgc2VydmljZXMiICJIVFRQUy9SRVNUIgogICAgICAgIG1vYmlsZUFwcCAtPiB0YXhpQXBwICJEZWVwIGxpbmtzIHdpdGggYm9va2luZyBjb250ZXh0IiAiRGVlcCBMaW5rIFByb3RvY29sIgogICAgICAgIAogICAgICAgICMgQmFja2VuZCBTZXJ2aWNlIFJlbGF0aW9uc2hpcHMKICAgICAgICBiYWNrZW5kU2VydmljZXMgLT4gZmxpZ2h0Q29udGV4dFNlcnZpY2UgIlJldHJpZXZlcyBmbGlnaHQgdGltaW5nIGludGVsbGlnZW5jZSIgIkludGVybmFsIEFQSSIKICAgICAgICBiYWNrZW5kU2VydmljZXMgLT4gdGF4aUludGVncmF0aW9uU2VydmljZSAiQWNjZXNzZXMgVWJlciBpbnRlZ3JhdGlvbiBjYXBhYmlsaXRpZXMiICJJbnRlcm5hbCBBUEkiCiAgICAgICAgYmFja2VuZFNlcnZpY2VzIC0+IGRlZXBMaW5rSGFuZGxlciAiTWFuYWdlcyBhcHAgdHJhbnNpdGlvbiBjb250ZXh0IiAiSW50ZXJuYWwgQVBJIgogICAgICAgIAogICAgICAgICMgSW50ZWdyYXRpb24gTGF5ZXIgUmVsYXRpb25zaGlwcwogICAgICAgIGZsaWdodENvbnRleHRTZXJ2aWNlIC0+IHJpZGVPcmNoZXN0cmF0aW9uQVBJICJQcm92aWRlcyBvcHRpbWFsIHRpbWluZyByZWNvbW1lbmRhdGlvbnMiICJIVFRQUy9SRVNUIgogICAgICAgIHRheGlJbnRlZ3JhdGlvblNlcnZpY2UgLT4gdGF4aUFwaSAiUmVxdWVzdHMgZXN0aW1hdGVzLCBjcmVhdGVzIGJvb2tpbmdzLCByZXRyaWV2ZXMgc3RhdHVzIiAiSFRUUFMvUkVTVCBBUEkiCiAgICAgICAgdGF4aUludGVncmF0aW9uU2VydmljZSAtPiByaWRlT3JjaGVzdHJhdGlvbkFQSSAiQ29vcmRpbmF0ZXMgcmlkZSBib29raW5nIGxpZmVjeWNsZSIgIkhUVFBTL1JFU1QiCiAgICAgICAgZGVlcExpbmtIYW5kbGVyIC0+IGNvbnRleHRQcmVzZXJ2YXRpb25TZXJ2aWNlICJQcmVzZXJ2ZXMgdXNlciBzdGF0ZSBhY3Jvc3MgdHJhbnNpdGlvbnMiICJIVFRQUy9SRVNUIgogICAgICAgIHJpZGVPcmNoZXN0cmF0aW9uQVBJIC0+IGNvbnRleHRQcmVzZXJ2YXRpb25TZXJ2aWNlICJNYWludGFpbnMgYm9va2luZyBjb250ZXh0IiAiSFRUUFMvUkVTVCIKICAgICAgICByaWRlT3JjaGVzdHJhdGlvbkFQSSAtPiBub3RpZmljYXRpb25IdWIgIlNlbmRzIHN0YXR1cyB1cGRhdGVzIGFuZCBub3RpZmljYXRpb25zIiAiSFRUUFMvUkVTVCIKICAgICAgICAKICAgICAgICAjIEZsaWdodCBDb250ZXh0IFNlcnZpY2UgQ29tcG9uZW50IFJlbGF0aW9uc2hpcHMKICAgICAgICBmbGlnaHREYXRhSW5nZXN0aW9uIC0+IGZsaWdodERhdGFTeXN0ZW0gIkZldGNoZXMgcmVhbC10aW1lIGZsaWdodCBkYXRhIiAiSFRUUFMvUkVTVCIKICAgICAgICBmbGlnaHREYXRhSW5nZXN0aW9uIC0+IHRpbWluZ0NhbGN1bGF0b3IgIlNlbmRzIHZhbGlkYXRlZCBmbGlnaHQgZGF0YSIgIkludGVybmFsIgogICAgICAgIHRpbWluZ0NhbGN1bGF0b3IgLT4gY2FjaGVNYW5hZ2VyICJTdG9yZXMgdGltaW5nIGNhbGN1bGF0aW9ucyIgIkludGVybmFsIgogICAgICAgIGNhY2hlTWFuYWdlciAtPiBmbGlnaHRDb250ZXh0QVBJICJQcm92aWRlcyBjYWNoZWQgZGF0YSIgIkludGVybmFsIgogICAgICAgIGZsaWdodENvbnRleHRBUEkgLT4gYmFja2VuZFNlcnZpY2VzICJFeHBvc2VzIGZsaWdodCB0aW1pbmcgZGF0YSIgIkhUVFBTL1JFU1QiCiAgICAgICAgZmxpZ2h0Q29udGV4dEFQSSAtPiByaWRlT3JjaGVzdHJhdGlvbkFQSSAiUHJvdmlkZXMgdGltaW5nIGNhbGN1bGF0aW9ucyIgIkhUVFBTL1JFU1QiCgogICAgICAgICMgRXh0ZXJuYWwgU3lzdGVtIFJlbGF0aW9uc2hpcHMKICAgICAgICBub3RpZmljYXRpb25IdWIgLT4gbW9iaWxlQXBwICJQdXNoZXMgcmVhbC10aW1lIHVwZGF0ZXMiICJQdXNoIE5vdGlmaWNhdGlvbnMiCiAgICAgICAgdGF4aUFwaSAtPiBub3RpZmljYXRpb25IdWIgIlNlbmRzIHJpZGUgc3RhdHVzIHVwZGF0ZXMiICJXZWJob29rcyIKICAgICAgICB0YXhpQXBwIC0+IHRheGlBcGkgIk1hbmFnZXMgcmlkZSBsaWZlY3ljbGUgYW5kIGRyaXZlciBjb21tdW5pY2F0aW9uIgogICAgICAgIHJpZGVPcmNoZXN0cmF0aW9uQVBJIC0+IHBheW1lbnRHYXRld2F5ICJQcm9jZXNzZXMgcmlkZSBwYXltZW50cyIgIkhUVFBTL1JFU1QiCiAgICB9CgogICAgdmlld3MgewogICAgICAgIHN5c3RlbUNvbnRleHQgcHJpb3JpdHlQYXNzU3lzdGVtICJTeXN0ZW1Db250ZXh0IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhbmltYXRpb24gewogICAgICAgICAgICAgICAgdHJhdmVsZXIKICAgICAgICAgICAgICAgIHByaW9yaXR5UGFzc1N5c3RlbQogICAgICAgICAgICAgICAgdGF4aUFwcCB0YXhpQXBpCiAgICAgICAgICAgICAgICBmbGlnaHREYXRhU3lzdGVtIHBheW1lbnRHYXRld2F5CiAgICAgICAgICAgIH0KICAgICAgICAgICAgZGVzY3JpcHRpb24gIlN5c3RlbSBjb250ZXh0IHNob3dpbmcgUHJpb3JpdHkgUGFzcyBpbnRlZ3JhdGlvbiB3aXRoIFViZXIgZWNvc3lzdGVtIGZvciBhaXJwb3J0IHRyYW5zcG9ydGF0aW9uIgogICAgICAgICAgICB0aXRsZSAiUHJpb3JpdHkgUGFzcyBVYmVyIEludGVncmF0aW9uIC0gQ29udGV4dCBEaWFncmFtIgogICAgICAgIH0KCiAgICAgICAgY29udGFpbmVyIHByaW9yaXR5UGFzc1N5c3RlbSAiQ29udGFpbmVyRGlhZ3JhbSIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYW5pbWF0aW9uIHsKICAgICAgICAgICAgICAgIHRyYXZlbGVyCiAgICAgICAgICAgICAgICBtb2JpbGVBcHAKICAgICAgICAgICAgICAgIGJhY2tlbmRTZXJ2aWNlcyBmbGlnaHRDb250ZXh0U2VydmljZSB0YXhpSW50ZWdyYXRpb25TZXJ2aWNlIGRlZXBMaW5rSGFuZGxlcgogICAgICAgICAgICAgICAgcmlkZU9yY2hlc3RyYXRpb25BUEkgY29udGV4dFByZXNlcnZhdGlvblNlcnZpY2Ugbm90aWZpY2F0aW9uSHViCiAgICAgICAgICAgICAgICB0YXhpQXBwIHRheGlBcGkgZmxpZ2h0RGF0YVN5c3RlbSBwYXltZW50R2F0ZXdheQogICAgICAgICAgICB9CiAgICAgICAgICAgIGF1dG9MYXlvdXQKICAgICAgICAgICAgZGVzY3JpcHRpb24gIkNvbnRhaW5lciBkaWFncmFtIHNob3dpbmcgdGhlIGludGVybmFsIHN0cnVjdHVyZSBvZiBQcmlvcml0eSBQYXNzIEludGVncmF0aW9uIFBsYXRmb3JtIHdpdGggZmxpZ2h0LWF3YXJlIFViZXIgaW50ZWdyYXRpb24iCiAgICAgICAgICAgIHRpdGxlICJQcmlvcml0eSBQYXNzIFViZXIgSW50ZWdyYXRpb24gLSBDb250YWluZXIgRGlhZ3JhbSIKICAgICAgICB9CgogICAgICAgIGNvbXBvbmVudCBmbGlnaHRDb250ZXh0U2VydmljZSAiRmxpZ2h0Q29udGV4dENvbXBvbmVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGFuaW1hdGlvbiB7CiAgICAgICAgICAgICAgICBmbGlnaHREYXRhSW5nZXN0aW9uCiAgICAgICAgICAgICAgICB0aW1pbmdDYWxjdWxhdG9yCiAgICAgICAgICAgICAgICBjYWNoZU1hbmFnZXIKICAgICAgICAgICAgICAgIGZsaWdodENvbnRleHRBUEkKICAgICAgICAgICAgICAgIGZsaWdodERhdGFTeXN0ZW0KICAgICAgICAgICAgICAgIGJhY2tlbmRTZXJ2aWNlcyByaWRlT3JjaGVzdHJhdGlvbkFQSQogICAgICAgICAgICB9CiAgICAgICAgICAgIGF1dG9MYXlvdXQKICAgICAgICAgICAgZGVzY3JpcHRpb24gIkNvbXBvbmVudCBkaWFncmFtIHNob3dpbmcgdGhlIHNpbXBsaWZpZWQgaW50ZXJuYWwgc3RydWN0dXJlIG9mIHRoZSBGbGlnaHQgQ29udGV4dCBTZXJ2aWNlIgogICAgICAgICAgICB0aXRsZSAiRmxpZ2h0IENvbnRleHQgU2VydmljZSAtIENvbXBvbmVudCBEaWFncmFtIgogICAgICAgIH0KCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiUGVyc29uIiB7CiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgICAgICBmb250U2l6ZSAyMgogICAgICAgICAgICAgICAgc2hhcGUgUGVyc29uCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiRXh0ZXJuYWwgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM5OTk5OTkKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJTb2Z0d2FyZSBTeXN0ZW0iIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzExNjhiZAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIk1vYmlsZSBBcHAiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzJlN2QzMgogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICAgICAgc2hhcGUgTW9iaWxlRGV2aWNlUG9ydHJhaXQKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJCYWNrZW5kIFNlcnZpY2VzIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMxNTY1YzAKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJTZXJ2aWNlIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM1ZTM1YjEKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJBUEkgR2F0ZXdheSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjZTY1MTAwCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiRGF0YSBJbmdlc3Rpb24iIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzc5NTU0OAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIlByb2Nlc3NpbmcgRW5naW5lIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM2MDdkOGIKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJDYWxjdWxhdGlvbiBFbmdpbmUiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzQ1NWE2NAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkNhY2hlIExheWVyIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICNmZjk4MDAKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJBUEkiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzljMjdiMAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIHJlbGF0aW9uc2hpcCAiUmVsYXRpb25zaGlwIiB7CiAgICAgICAgICAgICAgICBkYXNoZWQgZmFsc2UKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCn0="
+  },
+  "views" : {
+    "componentViews" : [ {
+      "animations" : [ {
+        "elements" : [ "10" ],
+        "order" : 1
+      }, {
+        "elements" : [ "11" ],
+        "order" : 2,
+        "relationships" : [ "39" ]
+      }, {
+        "elements" : [ "12" ],
+        "order" : 3,
+        "relationships" : [ "40" ]
+      }, {
+        "elements" : [ "13" ],
+        "order" : 4,
+        "relationships" : [ "41" ]
+      }, {
+        "elements" : [ "4" ],
+        "order" : 5,
+        "relationships" : [ "36" ]
+      }, {
+        "elements" : [ "16", "8" ],
+        "order" : 6,
+        "relationships" : [ "42", "44" ]
+      } ],
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "TopBottom",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "containerId" : "9",
+      "description" : "Component diagram showing the simplified internal structure of the Flight Context Service",
+      "elements" : [ {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "10",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "11",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "12",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "13",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "16",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "FlightContextComponents",
+      "order" : 3,
+      "relationships" : [ {
+        "id" : "36"
+      }, {
+        "id" : "39"
+      }, {
+        "id" : "40"
+      }, {
+        "id" : "41"
+      }, {
+        "id" : "42"
+      }, {
+        "id" : "44"
+      } ],
+      "title" : "Flight Context Service - Component Diagram"
+    } ],
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "SystemContext",
+      "metadataSymbols" : "SquareBrackets",
+      "styles" : {
+        "elements" : [ {
+          "color" : "#ffffff",
+          "fontSize" : 22,
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "background" : "#999999",
+          "color" : "#ffffff",
+          "tag" : "External System"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "tag" : "Software System"
+        }, {
+          "background" : "#2e7d32",
+          "color" : "#ffffff",
+          "shape" : "MobileDevicePortrait",
+          "tag" : "Mobile App"
+        }, {
+          "background" : "#1565c0",
+          "color" : "#ffffff",
+          "tag" : "Backend Services"
+        }, {
+          "background" : "#5e35b1",
+          "color" : "#ffffff",
+          "tag" : "Service"
+        }, {
+          "background" : "#e65100",
+          "color" : "#ffffff",
+          "tag" : "API Gateway"
+        }, {
+          "background" : "#795548",
+          "color" : "#ffffff",
+          "tag" : "Data Ingestion"
+        }, {
+          "background" : "#607d8b",
+          "color" : "#ffffff",
+          "tag" : "Processing Engine"
+        }, {
+          "background" : "#455a64",
+          "color" : "#ffffff",
+          "tag" : "Calculation Engine"
+        }, {
+          "background" : "#ff9800",
+          "color" : "#ffffff",
+          "tag" : "Cache Layer"
+        }, {
+          "background" : "#9c27b0",
+          "color" : "#ffffff",
+          "tag" : "API"
+        } ],
+        "relationships" : [ {
+          "dashed" : false,
+          "tag" : "Relationship"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "animations" : [ {
+        "elements" : [ "1" ],
+        "order" : 1
+      }, {
+        "elements" : [ "7" ],
+        "order" : 2,
+        "relationships" : [ "19" ]
+      }, {
+        "elements" : [ "14", "15", "8", "9" ],
+        "order" : 3,
+        "relationships" : [ "22", "26", "27", "28", "43" ]
+      }, {
+        "elements" : [ "16", "17", "18" ],
+        "order" : 4,
+        "relationships" : [ "23", "29", "32", "33", "34", "35", "45" ]
+      }, {
+        "elements" : [ "2", "3", "4", "5" ],
+        "order" : 5,
+        "relationships" : [ "21", "24", "30", "37", "46", "48", "49" ]
+      } ],
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "TopBottom",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "description" : "Container diagram showing the internal structure of Priority Pass Integration Platform with flight-aware Uber integration",
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "14",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "15",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "16",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "17",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "18",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "ContainerDiagram",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "19"
+      }, {
+        "id" : "21"
+      }, {
+        "id" : "22"
+      }, {
+        "id" : "23"
+      }, {
+        "id" : "24"
+      }, {
+        "id" : "26"
+      }, {
+        "id" : "27"
+      }, {
+        "id" : "28"
+      }, {
+        "id" : "29"
+      }, {
+        "id" : "30"
+      }, {
+        "id" : "32"
+      }, {
+        "id" : "33"
+      }, {
+        "id" : "34"
+      }, {
+        "id" : "35"
+      }, {
+        "id" : "37"
+      }, {
+        "id" : "43"
+      }, {
+        "id" : "45"
+      }, {
+        "id" : "46"
+      }, {
+        "id" : "48"
+      }, {
+        "id" : "49"
+      } ],
+      "softwareSystemId" : "6",
+      "title" : "Priority Pass Uber Integration - Container Diagram"
+    } ],
+    "systemContextViews" : [ {
+      "animations" : [ {
+        "elements" : [ "1" ],
+        "order" : 1
+      }, {
+        "elements" : [ "6" ],
+        "order" : 2,
+        "relationships" : [ "20" ]
+      }, {
+        "elements" : [ "2", "3" ],
+        "order" : 3,
+        "relationships" : [ "21", "25", "31", "47", "48" ]
+      }, {
+        "elements" : [ "4", "5" ],
+        "order" : 4,
+        "relationships" : [ "38", "50" ]
+      } ],
+      "description" : "System context showing Priority Pass integration with Uber ecosystem for airport transportation",
+      "dimensions" : {
+        "height" : 3200,
+        "width" : 1809
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 1230,
+        "y" : 90
+      }, {
+        "id" : "2",
+        "x" : 65,
+        "y" : 630
+      }, {
+        "id" : "3",
+        "x" : 70,
+        "y" : 1515
+      }, {
+        "id" : "4",
+        "x" : 85,
+        "y" : 2620
+      }, {
+        "id" : "5",
+        "x" : 1080,
+        "y" : 2635
+      }, {
+        "id" : "6",
+        "x" : 1075,
+        "y" : 1935
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "SystemContext",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "20",
+        "vertices" : [ {
+          "x" : 1405,
+          "y" : 1145
+        } ]
+      }, {
+        "id" : "21"
+      }, {
+        "id" : "25"
+      }, {
+        "id" : "31",
+        "vertices" : [ {
+          "x" : 882,
+          "y" : 1893
+        }, {
+          "x" : 660,
+          "y" : 1665
+        } ]
+      }, {
+        "id" : "38"
+      }, {
+        "id" : "47",
+        "vertices" : [ {
+          "x" : 460,
+          "y" : 2090
+        } ]
+      }, {
+        "id" : "48"
+      }, {
+        "id" : "50"
+      } ],
+      "softwareSystemId" : "6",
+      "title" : "Priority Pass Uber Integration - Context Diagram"
+    } ]
+  }
+}

@@ -5,8 +5,8 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
         traveler = person "Traveler" "Airport passenger using Priority Pass benefits and needing transportation" "User"
         
         # External Systems
-        uberApp = softwareSystem "Uber Mobile App" "Native Uber application for ride booking and management" "External System"
-        uberAPI = softwareSystem "Uber API Platform" "Uber's ride request, pricing, and management APIs" "External System"
+        taxiApp = softwareSystem "TaxiService  Mobile App" "Native Taxi application for ride booking and management" "External System"
+        taxiApi = softwareSystem "TaxiSerivce API Platform" "Taxi ride request, pricing, and management APIs" "External System"
         flightDataSystem = softwareSystem "Flight Data Provider" "Real-time flight information, delays, and gate updates" "External System"
         paymentGateway = softwareSystem "Payment Gateway" "Secure payment processing for ride bookings" "External System"
         
@@ -26,7 +26,7 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
                 cacheManager = component "Cache Manager" "Caches flight data and timing calculations" "Cache Layer"
                 flightContextAPI = component "Flight Context API" "RESTful API exposing flight timing data" "API"
             }
-            uberIntegrationService = container "Uber Integration Service" "Handles Uber API calls, ride orchestration, and booking management" "Service"
+            taxiIntegrationService = container "Uber Integration Service" "Handles Uber API calls, ride orchestration, and booking management" "Service"
             deepLinkHandler = container "Deep Link Handler" "Manages seamless handoffs to/from Uber app with context preservation" "Service"
             
             # Integration Layer
@@ -37,22 +37,22 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
         
         # User Relationships
         traveler -> mobileApp "Views flight details, requests rides, receives recommendations"
-        traveler -> uberApp "Completes ride booking and tracks journey"
+        traveler -> taxiApp "Completes ride booking and tracks journey"
         
         # Mobile App Relationships
         mobileApp -> backendServices "Communicates with core services" "HTTPS/REST"
         mobileApp -> rideOrchestrationAPI "Requests rides and booking services" "HTTPS/REST"
-        mobileApp -> uberApp "Deep links with booking context" "Deep Link Protocol"
+        mobileApp -> taxiApp "Deep links with booking context" "Deep Link Protocol"
         
         # Backend Service Relationships
         backendServices -> flightContextService "Retrieves flight timing intelligence" "Internal API"
-        backendServices -> uberIntegrationService "Accesses Uber integration capabilities" "Internal API"
+        backendServices -> taxiIntegrationService "Accesses Uber integration capabilities" "Internal API"
         backendServices -> deepLinkHandler "Manages app transition context" "Internal API"
         
         # Integration Layer Relationships
         flightContextService -> rideOrchestrationAPI "Provides optimal timing recommendations" "HTTPS/REST"
-        uberIntegrationService -> uberAPI "Requests estimates, creates bookings, retrieves status" "HTTPS/REST API"
-        uberIntegrationService -> rideOrchestrationAPI "Coordinates ride booking lifecycle" "HTTPS/REST"
+        taxiIntegrationService -> taxiApi "Requests estimates, creates bookings, retrieves status" "HTTPS/REST API"
+        taxiIntegrationService -> rideOrchestrationAPI "Coordinates ride booking lifecycle" "HTTPS/REST"
         deepLinkHandler -> contextPreservationService "Preserves user state across transitions" "HTTPS/REST"
         rideOrchestrationAPI -> contextPreservationService "Maintains booking context" "HTTPS/REST"
         rideOrchestrationAPI -> notificationHub "Sends status updates and notifications" "HTTPS/REST"
@@ -67,8 +67,8 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
 
         # External System Relationships
         notificationHub -> mobileApp "Pushes real-time updates" "Push Notifications"
-        uberAPI -> notificationHub "Sends ride status updates" "Webhooks"
-        uberApp -> uberAPI "Manages ride lifecycle and driver communication"
+        taxiApi -> notificationHub "Sends ride status updates" "Webhooks"
+        taxiApp -> taxiApi "Manages ride lifecycle and driver communication"
         rideOrchestrationAPI -> paymentGateway "Processes ride payments" "HTTPS/REST"
     }
 
@@ -78,10 +78,9 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
             animation {
                 traveler
                 priorityPassSystem
-                uberApp uberAPI
+                taxiApp taxiApi
                 flightDataSystem paymentGateway
             }
-            autoLayout
             description "System context showing Priority Pass integration with Uber ecosystem for airport transportation"
             title "Priority Pass Uber Integration - Context Diagram"
         }
@@ -91,9 +90,9 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
             animation {
                 traveler
                 mobileApp
-                backendServices flightContextService uberIntegrationService deepLinkHandler
+                backendServices flightContextService taxiIntegrationService deepLinkHandler
                 rideOrchestrationAPI contextPreservationService notificationHub
-                uberApp uberAPI flightDataSystem paymentGateway
+                taxiApp taxiApi flightDataSystem paymentGateway
             }
             autoLayout
             description "Container diagram showing the internal structure of Priority Pass Integration Platform with flight-aware Uber integration"
