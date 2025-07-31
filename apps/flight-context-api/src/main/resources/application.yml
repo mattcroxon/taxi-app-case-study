@@ -1,0 +1,30 @@
+server:
+  port: 9000
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: flight-context-api
+  cache:
+    type: simple
+    cache-names:
+      - flights
+      - timing-recommendations
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+
+logging:
+  level:
+    com.prioritypass.flightcontext: INFO
+    org.springframework.cache: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
