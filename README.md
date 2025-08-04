@@ -10,6 +10,29 @@ The following solution architecture contains:
 
 ## Viewing the solution artefacts
 
+### Viewing the static diagrams
+
+#### C4 Diagrams 
+- [Context Diagram](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/SystemContext.png)
+- Container Diagram(https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/ContainerDiagram.png)
+- Component Diagram(https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/FlightContextComponents.png)
+
+#### Sequence Diagrams 
+- [Book Taxi sequence diagram](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/sequence/book_taxi_sequence_diagram.png)
+
+#### Application wireframes 
+1. [View Lounges](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/1-View_Lounges.png)
+2. [View Lounge](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/2-View_Lounge.png)
+3. [Click Book Add On](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/3-Click_Book_Add_On.png)
+4. [Select Add On](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/4-Select_Add_On.png)
+5. [Submit Flight Details](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/5-Submit_Flight_Details.png)
+6. [Select Taxi Options](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/6-Select_Taxi_Options.png)
+7. [View Trip Overview](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/7-View_Trip_Overview.png)
+8. [View Trip Breakdown](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/8-View_Trip_Breakdown.png)
+9. [View Trip Confirmation](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/wireframes/9-View_Trip_Confirmation.png)
+
+#### Viewing dynamically generated documents
+
 From the root folder, run `docker compose up`
 - The C4 documentation documentation (served by Structurizr), will be available at [http://localhost:8080](http://localhost:8080)
 - The PlantUML server, containing the sequence diagrams, will be available at [http://localhost:8081](http://localhost:8081). Currently, you will need to copy/paste the markdown files into the PlantUML user interface
