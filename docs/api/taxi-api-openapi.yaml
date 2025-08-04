@@ -1,0 +1,597 @@
+openapi: 3.0.3
+info:
+  title: Taxi Service API
+  description: |
+    API for ride booking, pricing, and management services based on Taxi API v1.2.
+    Supports product discovery, fare estimation, scheduled rides, and real-time status updates.
+  version: 1.2.0
+  contact:
+    name: Taxi Service API Support
+    email: api-support@taxiservice.com
+
+servers:
+  - url: https://api.taxiservice.com/v1.2
+    description: Production server
+  - url: https://api-staging.taxiservice.com/v1.2
+    description: Staging server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /products:
+    get:
+      summary: Get available ride products
+      description: Retrieve all available ride products/types for the current location
+      operationId: getProducts
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+          description: Latitude of the location
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+          description: Longitude of the location
+      responses:
+        '200':
+          description: List of available ride products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /requests/estimate:
+    post:
+      summary: Get upfront fare estimate
+      description: Calculate fare estimate for a ride between specified locations
+      operationId: getFareEstimate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimateRequest'
+      responses:
+        '200':
+          description: Fare estimate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareEstimate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /requests:
+    post:
+      summary: Create ride request
+      description: Create a new ride request with optional scheduled pickup time
+      operationId: createRideRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RideRequest'
+      responses:
+        '200':
+          description: Ride request created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideBooking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Conflict - ride already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /requests/{request_id}:
+    get:
+      summary: Get ride request status
+      description: Retrieve current status and details of a ride request
+      operationId: getRideRequestStatus
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the ride request
+      responses:
+        '200':
+          description: Ride request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideStatus'
+        '404':
+          description: Ride request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      summary: Cancel ride request
+      description: Cancel an existing ride request
+      operationId: cancelRideRequest
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the ride request
+      responses:
+        '204':
+          description: Ride request cancelled successfully
+        '404':
+          description: Ride request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Cannot cancel ride at current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /webhooks/status:
+    post:
+      summary: Ride status webhook
+      description: Webhook endpoint for receiving ride status updates
+      operationId: rideStatusWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+      responses:
+        '200':
+          description: Webhook received successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Product:
+      type: object
+      required:
+        - product_id
+        - display_name
+        - description
+      properties:
+        product_id:
+          type: string
+          description: Unique identifier for the product
+          example: "uber_x"
+        display_name:
+          type: string
+          description: Display name of the product
+          example: "TaxiX"
+        description:
+          type: string
+          description: Description of the product
+          example: "Affordable everyday rides"
+        capacity:
+          type: integer
+          description: Maximum number of passengers
+          minimum: 1
+          example: 4
+        image_url:
+          type: string
+          format: uri
+          description: URL to product image
+        price_details:
+          $ref: '#/components/schemas/PriceDetails'
+
+    PriceDetails:
+      type: object
+      properties:
+        service_fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceFee'
+        cost_per_minute:
+          type: number
+          format: double
+          description: Cost per minute in local currency
+        distance_unit:
+          type: string
+          enum: [mile, km]
+        cost_per_distance_unit:
+          type: number
+          format: double
+          description: Cost per distance unit
+        base_fare:
+          type: number
+          format: double
+          description: Base fare for the ride
+        minimum_fare:
+          type: number
+          format: double
+          description: Minimum fare for the ride
+        currency_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: ISO 4217 currency code
+          example: "USD"
+
+    ServiceFee:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the service fee
+        fee:
+          type: number
+          format: double
+          description: Amount of the service fee
+
+    EstimateRequest:
+      type: object
+      required:
+        - start_latitude
+        - start_longitude
+        - end_latitude
+        - end_longitude
+      properties:
+        start_latitude:
+          type: number
+          format: double
+          description: Starting location latitude
+        start_longitude:
+          type: number
+          format: double
+          description: Starting location longitude
+        end_latitude:
+          type: number
+          format: double
+          description: Destination latitude
+        end_longitude:
+          type: number
+          format: double
+          description: Destination longitude
+        product_id:
+          type: string
+          description: Specific product ID to estimate for
+        scheduled_pickup_time:
+          type: string
+          format: date-time
+          description: ISO 8601 datetime for scheduled pickup
+
+    FareEstimate:
+      type: object
+      properties:
+        fare:
+          $ref: '#/components/schemas/Fare'
+        trip:
+          $ref: '#/components/schemas/Trip'
+        pickup_estimate:
+          type: integer
+          description: Estimated pickup time in minutes
+
+    Fare:
+      type: object
+      properties:
+        value:
+          type: number
+          format: double
+          description: Total fare amount
+        currency_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: ISO 4217 currency code
+        display:
+          type: string
+          description: Formatted fare for display
+          example: "$15.50"
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/FareBreakdown'
+
+    FareBreakdown:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [base_fare, distance, time, service_fee, surge, tax, tip]
+        name:
+          type: string
+          description: Display name for the fare component
+        value:
+          type: number
+          format: double
+          description: Amount for this component
+
+    Trip:
+      type: object
+      properties:
+        distance_estimate:
+          type: number
+          format: double
+          description: Estimated trip distance
+        duration_estimate:
+          type: integer
+          description: Estimated trip duration in seconds
+        distance_unit:
+          type: string
+          enum: [mile, km]
+
+    RideRequest:
+      type: object
+      required:
+        - start_latitude
+        - start_longitude
+        - end_latitude
+        - end_longitude
+        - product_id
+      properties:
+        product_id:
+          type: string
+          description: ID of the requested product
+        start_latitude:
+          type: number
+          format: double
+          description: Starting location latitude
+        start_longitude:
+          type: number
+          format: double
+          description: Starting location longitude
+        end_latitude:
+          type: number
+          format: double
+          description: Destination latitude
+        end_longitude:
+          type: number
+          format: double
+          description: Destination longitude
+        start_nickname:
+          type: string
+          description: Nickname for pickup location
+          example: "Home"
+        end_nickname:
+          type: string
+          description: Nickname for destination
+          example: "Airport"
+        scheduled_pickup_time:
+          type: string
+          format: date-time
+          description: ISO 8601 datetime for scheduled pickup
+        passenger_note:
+          type: string
+          description: Note for the driver
+          maxLength: 500
+        fare_id:
+          type: string
+          description: Fare ID from previous estimate
+
+    RideBooking:
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: Unique identifier for the ride request
+        status:
+          $ref: '#/components/schemas/RideStatusEnum'
+        product:
+          $ref: '#/components/schemas/Product'
+        driver:
+          $ref: '#/components/schemas/Driver'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        location:
+          $ref: '#/components/schemas/Location'
+        destination:
+          $ref: '#/components/schemas/Location'
+        fare:
+          $ref: '#/components/schemas/Fare'
+        scheduled_pickup_time:
+          type: string
+          format: date-time
+          description: Scheduled pickup time if applicable
+        deep_link_url:
+          type: string
+          format: uri
+          description: Deep link URL to open in taxi app
+
+    RideStatus:
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: Unique identifier for the ride request
+        status:
+          $ref: '#/components/schemas/RideStatusEnum'
+        driver:
+          $ref: '#/components/schemas/Driver'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        location:
+          $ref: '#/components/schemas/Location'
+        destination:
+          $ref: '#/components/schemas/Location'
+        eta:
+          type: integer
+          description: Estimated time of arrival in minutes
+        surge_multiplier:
+          type: number
+          format: double
+          description: Current surge pricing multiplier
+
+    RideStatusEnum:
+      type: string
+      enum:
+        - processing
+        - no_drivers_available
+        - accepted
+        - arriving
+        - in_progress
+        - driver_canceled
+        - rider_canceled
+        - completed
+
+    Driver:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          description: Driver's phone number (masked)
+        rating:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 5
+          description: Driver's average rating
+        picture_url:
+          type: string
+          format: uri
+          description: URL to driver's profile picture
+        name:
+          type: string
+          description: Driver's name
+
+    Vehicle:
+      type: object
+      properties:
+        make:
+          type: string
+          description: Vehicle make
+          example: "Toyota"
+        model:
+          type: string
+          description: Vehicle model
+          example: "Camry"
+        license_plate:
+          type: string
+          description: Vehicle license plate
+        picture_url:
+          type: string
+          format: uri
+          description: URL to vehicle picture
+
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        bearing:
+          type: integer
+          description: Compass bearing in degrees
+          minimum: 0
+          maximum: 359
+
+    StatusUpdate:
+      type: object
+      required:
+        - request_id
+        - status
+        - timestamp
+      properties:
+        request_id:
+          type: string
+          description: Unique identifier for the ride request
+        status:
+          $ref: '#/components/schemas/RideStatusEnum'
+        driver:
+          $ref: '#/components/schemas/Driver'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        location:
+          $ref: '#/components/schemas/Location'
+        eta:
+          type: integer
+          description: Estimated time of arrival in minutes
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the status update
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

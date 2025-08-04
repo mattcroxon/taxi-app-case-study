@@ -1,0 +1,939 @@
+openapi: 3.0.3
+info:
+  title: Leisure Lounges Lounge Access API
+  description: |
+    API for Leisure Lounges lounge inventory management and booking services.
+    Enables taxi applications and other partners to discover available lounges,
+    check real-time capacity, and book lounge access for travelers.
+  version: 2.1.0
+  contact:
+    name: Leisure Lounges API Support
+    email: api-support@leisurelounge.com
+  license:
+    name: Leisure Lounges API License
+    url: https://www.leisurelounge.com/api-license
+
+servers:
+  - url: https://api.leisurelounge.com/v2
+    description: Production server
+  - url: https://api-staging.leisurelounge.com/v2
+    description: Staging server
+
+security:
+  - apiKeyAuth: []
+  - oAuth2: [lounges:read, lounges:book, member:read]
+
+paths:
+  /airports/{airport_code}/lounges:
+    get:
+      summary: Get available lounges at airport
+      description: |
+        Retrieve all Leisure Lounges lounges available at the specified airport,
+        including real-time availability and capacity information.
+      operationId: getAirportLounges
+      parameters:
+        - name: airport_code
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{3}$'
+          description: IATA airport code
+          example: "LHR"
+        - name: terminal
+          in: query
+          schema:
+            type: string
+          description: Specific terminal to filter lounges
+          example: "T3"
+        - name: arrival_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Expected arrival time for capacity planning
+        - name: departure_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Expected departure time for capacity planning
+        - name: party_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            default: 1
+          description: Number of travelers in party
+      responses:
+        '200':
+          description: List of available lounges
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  airport_code:
+                    type: string
+                    example: "LHR"
+                  airport_name:
+                    type: string
+                    example: "London Heathrow"
+                  lounges:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lounge'
+                  last_updated:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Airport not found or no lounges available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /lounges/{lounge_id}:
+    get:
+      summary: Get lounge details
+      description: Retrieve detailed information about a specific lounge
+      operationId: getLoungeDetails
+      parameters:
+        - name: lounge_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the lounge
+      responses:
+        '200':
+          description: Lounge details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoungeDetail'
+        '404':
+          description: Lounge not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /lounges/{lounge_id}/availability:
+    get:
+      summary: Check real-time lounge availability
+      description: Get current availability and capacity for a specific lounge
+      operationId: getLoungeAvailability
+      parameters:
+        - name: lounge_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the lounge
+        - name: visit_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Intended visit time for availability check
+        - name: party_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            default: 1
+          description: Number of travelers in party
+      responses:
+        '200':
+          description: Lounge availability information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoungeAvailability'
+        '404':
+          description: Lounge not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /bookings:
+    post:
+      summary: Create lounge booking
+      description: Book lounge access for Leisure Lounges members
+      operationId: createLoungeBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRequest'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Booking conflict or capacity exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Member not eligible or insufficient credits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      summary: List member bookings
+      description: Retrieve bookings for the authenticated member
+      operationId: getMemberBookings
+      parameters:
+        - name: member_id
+          in: query
+          schema:
+            type: string
+          description: Member ID (optional if using member token)
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [confirmed, cancelled, completed, no_show]
+          description: Filter bookings by status
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter bookings from this date
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter bookings to this date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of bookings to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of bookings to skip
+      responses:
+        '200':
+          description: List of member bookings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                  total_count:
+                    type: integer
+                  has_more:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /bookings/{booking_id}:
+    get:
+      summary: Get booking details
+      description: Retrieve details of a specific booking
+      operationId: getBookingDetails
+      parameters:
+        - name: booking_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the booking
+      responses:
+        '200':
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    put:
+      summary: Update booking
+      description: Modify an existing booking (limited updates allowed)
+      operationId: updateBooking
+      parameters:
+        - name: booking_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdateRequest'
+      responses:
+        '200':
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Cannot update booking in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      summary: Cancel booking
+      description: Cancel an existing lounge booking
+      operationId: cancelBooking
+      parameters:
+        - name: booking_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the booking
+      responses:
+        '204':
+          description: Booking cancelled successfully
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Cannot cancel booking in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /members/{member_id}/eligibility:
+    get:
+      summary: Check member eligibility
+      description: Verify member's eligibility for lounge access and available credits
+      operationId: checkMemberEligibility
+      parameters:
+        - name: member_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Leisure Lounges member ID
+      responses:
+        '200':
+          description: Member eligibility information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberEligibility'
+        '404':
+          description: Member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    oAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.leisurelounge.com/oauth2/token
+          scopes:
+            lounges:read: Read lounge information
+            lounges:book: Book lounge access
+            member:read: Read member information
+
+  schemas:
+    Lounge:
+      type: object
+      required:
+        - lounge_id
+        - name
+        - airport_code
+        - terminal
+        - location
+      properties:
+        lounge_id:
+          type: string
+          description: Unique identifier for the lounge
+          example: "lhr_t3_galleries_first"
+        name:
+          type: string
+          description: Lounge name
+          example: "Galleries First Lounge"
+        airport_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: IATA airport code
+          example: "LHR"
+        terminal:
+          type: string
+          description: Airport terminal
+          example: "T3"
+        location:
+          $ref: '#/components/schemas/LoungeLocation'
+        operating_hours:
+          $ref: '#/components/schemas/OperatingHours'
+        current_status:
+          $ref: '#/components/schemas/LoungeStatus'
+        amenities:
+          type: array
+          items:
+            type: string
+          example: ["wifi", "food", "bar", "showers", "business_center"]
+        capacity_info:
+          $ref: '#/components/schemas/CapacityInfo'
+        access_rules:
+          $ref: '#/components/schemas/AccessRules'
+
+    LoungeDetail:
+      allOf:
+        - $ref: '#/components/schemas/Lounge'
+        - type: object
+          properties:
+            description:
+              type: string
+              description: Detailed lounge description
+            images:
+              type: array
+              items:
+                $ref: '#/components/schemas/LoungeImage'
+            contact_info:
+              $ref: '#/components/schemas/ContactInfo'
+            directions:
+              type: string
+              description: Directions to the lounge
+            dress_code:
+              type: string
+              description: Dress code requirements
+              example: "Smart casual required"
+            age_restrictions:
+              type: string
+              description: Age restrictions if any
+              example: "Children under 2 free, 2-12 years 50% charge"
+
+    LoungeLocation:
+      type: object
+      properties:
+        zone:
+          type: string
+          description: Airport zone or area
+          example: "Departures Level 2"
+        gate_proximity:
+          type: string
+          description: Proximity to gates
+          example: "Near gates 1-10"
+        walking_time:
+          type: integer
+          description: Walking time from security in minutes
+          example: 5
+
+    OperatingHours:
+      type: object
+      properties:
+        monday:
+          $ref: '#/components/schemas/DayHours'
+        tuesday:
+          $ref: '#/components/schemas/DayHours'
+        wednesday:
+          $ref: '#/components/schemas/DayHours'
+        thursday:
+          $ref: '#/components/schemas/DayHours'
+        friday:
+          $ref: '#/components/schemas/DayHours'
+        saturday:
+          $ref: '#/components/schemas/DayHours'
+        sunday:
+          $ref: '#/components/schemas/DayHours'
+        timezone:
+          type: string
+          description: Timezone of the lounge
+          example: "Europe/London"
+
+    DayHours:
+      type: object
+      properties:
+        open_time:
+          type: string
+          pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: Opening time in HH:MM format
+          example: "05:00"
+        close_time:
+          type: string
+          pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: Closing time in HH:MM format
+          example: "22:00"
+        is_closed:
+          type: boolean
+          description: Whether the lounge is closed on this day
+          default: false
+
+    LoungeStatus:
+      type: string
+      enum:
+        - open
+        - closed
+        - at_capacity
+        - limited_access
+        - maintenance
+      description: Current operational status of the lounge
+
+    CapacityInfo:
+      type: object
+      properties:
+        total_capacity:
+          type: integer
+          description: Maximum capacity of the lounge
+        current_occupancy:
+          type: integer
+          description: Current number of guests
+        availability_level:
+          type: string
+          enum: [high, medium, low, full]
+          description: Current availability level
+        estimated_wait_time:
+          type: integer
+          description: Estimated wait time in minutes
+          minimum: 0
+
+    AccessRules:
+      type: object
+      properties:
+        membership_types:
+          type: array
+          items:
+            type: string
+          description: Eligible membership types
+          example: ["standard", "prestige", "business"]
+        guest_policy:
+          $ref: '#/components/schemas/GuestPolicy'
+        advance_booking_required:
+          type: boolean
+          description: Whether advance booking is required
+          default: false
+        cancellation_policy:
+          type: string
+          description: Cancellation policy details
+
+    GuestPolicy:
+      type: object
+      properties:
+        guests_allowed:
+          type: boolean
+          description: Whether guests are allowed
+        max_guests:
+          type: integer
+          description: Maximum number of guests per member
+        guest_fee:
+          type: number
+          format: double
+          description: Fee per guest in USD
+        children_policy:
+          type: string
+          description: Policy for children
+
+    LoungeAvailability:
+      type: object
+      properties:
+        lounge_id:
+          type: string
+        is_available:
+          type: boolean
+          description: Whether the lounge is currently available
+        capacity_info:
+          $ref: '#/components/schemas/CapacityInfo'
+        next_available_slot:
+          type: string
+          format: date-time
+          description: Next available time slot if currently full
+        booking_window:
+          $ref: '#/components/schemas/BookingWindow'
+
+    BookingWindow:
+      type: object
+      properties:
+        earliest_booking:
+          type: string
+          format: date-time
+          description: Earliest time a booking can be made
+        latest_booking:
+          type: string
+          format: date-time
+          description: Latest time a booking can be made
+        advance_booking_days:
+          type: integer
+          description: How many days in advance bookings can be made
+
+    BookingRequest:
+      type: object
+      required:
+        - lounge_id
+        - member_id
+        - visit_date
+        - visit_time
+        - party_size
+      properties:
+        lounge_id:
+          type: string
+          description: ID of the lounge to book
+        member_id:
+          type: string
+          description: Leisure Lounges member ID
+        visit_date:
+          type: string
+          format: date
+          description: Date of the visit
+        visit_time:
+          type: string
+          pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: Expected arrival time at lounge
+        party_size:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Number of people in the party
+        duration_hours:
+          type: number
+          format: double
+          minimum: 0.5
+          maximum: 6
+          default: 3
+          description: Expected duration of stay in hours
+        special_requests:
+          type: string
+          description: Any special requests or requirements
+          maxLength: 500
+        flight_number:
+          type: string
+          description: Flight number for context
+        guest_details:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuestDetail'
+          description: Details of accompanying guests
+
+    GuestDetail:
+      type: object
+      required:
+        - name
+        - age_category
+      properties:
+        name:
+          type: string
+          description: Guest name
+        age_category:
+          type: string
+          enum: [adult, child, infant]
+          description: Age category of the guest
+        relationship:
+          type: string
+          description: Relationship to member
+          example: "spouse"
+
+    Booking:
+      type: object
+      properties:
+        booking_id:
+          type: string
+          description: Unique booking identifier
+        lounge:
+          $ref: '#/components/schemas/Lounge'
+        member_id:
+          type: string
+          description: Leisure Lounges member ID
+        status:
+          type: string
+          enum: [confirmed, cancelled, completed, no_show, checked_in]
+          description: Current booking status
+        visit_date:
+          type: string
+          format: date
+        visit_time:
+          type: string
+          pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+        party_size:
+          type: integer
+        duration_hours:
+          type: number
+          format: double
+        total_cost:
+          type: number
+          format: double
+          description: Total cost in USD
+        confirmation_code:
+          type: string
+          description: Booking confirmation code
+        qr_code:
+          type: string
+          description: QR code for lounge entry
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        check_in_time:
+          type: string
+          format: date-time
+          description: Actual check-in time
+        check_out_time:
+          type: string
+          format: date-time
+          description: Actual check-out time
+
+    BookingDetail:
+      allOf:
+        - $ref: '#/components/schemas/Booking'
+        - type: object
+          properties:
+            special_requests:
+              type: string
+            flight_number:
+              type: string
+            guest_details:
+              type: array
+              items:
+                $ref: '#/components/schemas/GuestDetail'
+            payment_details:
+              $ref: '#/components/schemas/PaymentDetails'
+            cancellation_details:
+              $ref: '#/components/schemas/CancellationDetails'
+
+    BookingUpdateRequest:
+      type: object
+      properties:
+        visit_time:
+          type: string
+          pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+          description: New visit time
+        party_size:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Updated party size
+        special_requests:
+          type: string
+          description: Updated special requests
+          maxLength: 500
+
+    MemberEligibility:
+      type: object
+      properties:
+        member_id:
+          type: string
+        membership_type:
+          type: string
+          enum: [standard, prestige, business, corporate]
+        is_active:
+          type: boolean
+          description: Whether membership is currently active
+        expiry_date:
+          type: string
+          format: date
+          description: Membership expiry date
+        available_visits:
+          type: integer
+          description: Number of visits remaining
+        guest_privileges:
+          $ref: '#/components/schemas/GuestPrivileges'
+        regional_access:
+          type: array
+          items:
+            type: string
+          description: Regions where member has access
+          example: ["worldwide", "premium_lounges"]
+
+    GuestPrivileges:
+      type: object
+      properties:
+        guests_included:
+          type: integer
+          description: Number of free guests included
+        additional_guest_fee:
+          type: number
+          format: double
+          description: Fee for additional guests in USD
+        children_free_age:
+          type: integer
+          description: Age under which children are free
+          example: 2
+
+    PaymentDetails:
+      type: object
+      properties:
+        amount_charged:
+          type: number
+          format: double
+          description: Amount charged in USD
+        payment_method:
+          type: string
+          description: Payment method used
+        transaction_id:
+          type: string
+          description: Payment transaction ID
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Currency code
+          example: "USD"
+
+    CancellationDetails:
+      type: object
+      properties:
+        cancelled_at:
+          type: string
+          format: date-time
+        cancellation_reason:
+          type: string
+        refund_amount:
+          type: number
+          format: double
+        refund_processed:
+          type: boolean
+
+    LoungeImage:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        alt_text:
+          type: string
+        image_type:
+          type: string
+          enum: [exterior, interior, amenity, food, view]
+
+    ContactInfo:
+      type: object
+      properties:
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        website:
+          type: string
+          format: uri
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - Invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

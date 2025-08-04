@@ -8,3 +8,37 @@ services:
     volumes:
       - ./docs/diagrams/structurizr:/usr/local/structurizr
     restart: always
+
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    ports:
+      - "8081:8080"
+    environment:
+      - PLANTUML_LIMIT_SIZE=8192
+    restart: always
+
+  taxi-api-swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8082:8080"
+    environment:
+      - SWAGGER_JSON=/docs/taxi-api-openapi.yaml
+    volumes:
+      - ./docs/api/taxi-api-openapi.yaml:/docs/taxi-api-openapi.yaml
+    restart: always
+
+  leisure-lounges-api-swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8083:8080"
+    environment:
+      - SWAGGER_JSON=/docs/leisure-lounges-api-openapi.yaml
+    volumes:
+      - ./docs/api/leisure-lounges-api-openapi.yaml:/docs/leisure-lounges-api-openapi.yaml
+    restart: always
+
+  flight-information-service:
+    build: ./apps/flight-information-service
+    ports:
+      - "9000:9000"
+    restart: always

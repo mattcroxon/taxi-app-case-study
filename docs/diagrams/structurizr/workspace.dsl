@@ -1,8 +1,8 @@
-workspace "Priority Pass Uber Integration" "Airport transportation integration between Priority Pass and Uber services" {
+workspace "Leisure Lounges Taxi Integration" "Airport transportation integration between Leisure Lounges and Taxi services" {
 
     model {
         # Users
-        traveler = person "Traveler" "Airport passenger using Priority Pass benefits and needing transportation" "User"
+        traveler = person "Traveler" "Airport passenger using Leisure Lounges benefits and needing transportation" "User"
         
         # External Systems
         taxiApp = softwareSystem "TaxiService  Mobile App" "Native Taxi application for ride booking and management" "External System"
@@ -11,23 +11,22 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
         paymentGateway = softwareSystem "Payment Gateway" "Secure payment processing for ride bookings" "External System"
         
         # Core System
-        priorityPassSystem = softwareSystem "Priority Pass Integration Platform" "Enhanced Priority Pass system with intelligent Uber integration" {
+        leisureLoungeSystem = softwareSystem "Leisure Lounges Integration Platform" "Enhanced Leisure Lounges system with intelligent Taxi integration" {
             description "Provides flight-aware transportation recommendations and seamless booking experience"
             
             # Mobile Application
-            mobileApp = container "Priority Pass Mobile App" "Enhanced mobile application with flight context and Uber integration capabilities" "Mobile App"
+            mobileApp = container "Leisure Lounges Mobile App" "Enhanced mobile application with flight context and Taxi integration capabilities" "Mobile App"
             
             # Backend Services
-            backendServices = container "Priority Pass Backend" "Core Priority Pass services with flight intelligence and integration capabilities" "Backend Services"
-            flightContextService = container "Flight Context Service" "Processes flight data to calculate optimal departure times" "Service" {
+            backendServices = container "Leisure Lounges Backend" "Core Leisure Lounges services with flight intelligence and integration capabilities" "Backend Services"
+            flightInformationService = container "Flight Information Service" "Retrieves flight departure and arrival times" "Service" {
                 # Core Components
                 flightDataIngestion = component "Flight Data Ingestion" "Collects and validates real-time flight information" "Data Ingestion"
-                timingCalculator = component "Timing Calculator" "Calculates optimal departure times based on flight schedules" "Calculation Engine"
                 cacheManager = component "Cache Manager" "Caches flight data and timing calculations" "Cache Layer"
-                flightContextAPI = component "Flight Context API" "RESTful API exposing flight timing data" "API"
+                flightInformationAPI = component "Flight Information API" "RESTful API exposing flight timing data" "API"
             }
-            taxiIntegrationService = container "Uber Integration Service" "Handles Uber API calls, ride orchestration, and booking management" "Service"
-            deepLinkHandler = container "Deep Link Handler" "Manages seamless handoffs to/from Uber app with context preservation" "Service"
+            taxiIntegrationService = container "Taxi Integration Service" "Handles Taxi API calls, ride orchestration, and booking management" "Service"
+            deepLinkHandler = container "Deep Link Handler" "Manages seamless handoffs to/from Taxi app with context preservation" "Service"
             
             # Integration Layer
             rideOrchestrationAPI = container "Ride Orchestration API" "Manages ride booking lifecycle and coordinates between systems" "API Gateway"
@@ -45,25 +44,23 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
         mobileApp -> taxiApp "Deep links with booking context" "Deep Link Protocol"
         
         # Backend Service Relationships
-        backendServices -> flightContextService "Retrieves flight timing intelligence" "Internal API"
-        backendServices -> taxiIntegrationService "Accesses Uber integration capabilities" "Internal API"
+        backendServices -> flightInformationService "Retrieves flight timing intelligence" "Internal API"
+        backendServices -> taxiIntegrationService "Accesses Taxi integration capabilities" "Internal API"
         backendServices -> deepLinkHandler "Manages app transition context" "Internal API"
         
         # Integration Layer Relationships
-        flightContextService -> rideOrchestrationAPI "Provides optimal timing recommendations" "HTTPS/REST"
+        flightInformationService -> rideOrchestrationAPI "Provides optimal timing recommendations" "HTTPS/REST"
         taxiIntegrationService -> taxiApi "Requests estimates, creates bookings, retrieves status" "HTTPS/REST API"
         taxiIntegrationService -> rideOrchestrationAPI "Coordinates ride booking lifecycle" "HTTPS/REST"
         deepLinkHandler -> contextPreservationService "Preserves user state across transitions" "HTTPS/REST"
         rideOrchestrationAPI -> contextPreservationService "Maintains booking context" "HTTPS/REST"
         rideOrchestrationAPI -> notificationHub "Sends status updates and notifications" "HTTPS/REST"
         
-        # Flight Context Service Component Relationships
+        # Flight Information Service Component Relationships
         flightDataIngestion -> flightDataSystem "Fetches real-time flight data" "HTTPS/REST"
-        flightDataIngestion -> timingCalculator "Sends validated flight data" "Internal"
-        timingCalculator -> cacheManager "Stores timing calculations" "Internal"
-        cacheManager -> flightContextAPI "Provides cached data" "Internal"
-        flightContextAPI -> backendServices "Exposes flight timing data" "HTTPS/REST"
-        flightContextAPI -> rideOrchestrationAPI "Provides timing calculations" "HTTPS/REST"
+        cacheManager -> flightInformationAPI "Provides cached data" "Internal"
+        flightInformationAPI -> backendServices "Exposes flight timing data" "HTTPS/REST"
+        flightInformationAPI -> rideOrchestrationAPI "Provides flight arrival / departure details" "HTTPS/REST"
 
         # External System Relationships
         notificationHub -> mobileApp "Pushes real-time updates" "Push Notifications"
@@ -73,45 +70,44 @@ workspace "Priority Pass Uber Integration" "Airport transportation integration b
     }
 
     views {
-        systemContext priorityPassSystem "SystemContext" {
+        systemContext leisureLoungeSystem "SystemContext" {
             include *
             animation {
                 traveler
-                priorityPassSystem
+                leisureLoungeSystem
                 taxiApp taxiApi
                 flightDataSystem paymentGateway
             }
-            description "System context showing Priority Pass integration with Uber ecosystem for airport transportation"
-            title "Priority Pass Uber Integration - Context Diagram"
+            description "System context showing Leisure Lounges integration with Taxi ecosystem for airport transportation"
+            title "Leisure Lounges Taxi Integration - Context Diagram"
         }
 
-        container priorityPassSystem "ContainerDiagram" {
+        container leisureLoungeSystem "ContainerDiagram" {
             include *
             animation {
                 traveler
                 mobileApp
-                backendServices flightContextService taxiIntegrationService deepLinkHandler
+                backendServices flightInformationService taxiIntegrationService deepLinkHandler
                 rideOrchestrationAPI contextPreservationService notificationHub
                 taxiApp taxiApi flightDataSystem paymentGateway
             }
             autoLayout
-            description "Container diagram showing the internal structure of Priority Pass Integration Platform with flight-aware Uber integration"
-            title "Priority Pass Uber Integration - Container Diagram"
+            description "Container diagram showing the internal structure of Leisure Lounges Integration Platform with flight-aware Taxi integration"
+            title "Leisure Lounges Taxi Integration - Container Diagram"
         }
 
-        component flightContextService "FlightContextComponents" {
+        component flightInformationService "FlightContextComponents" {
             include *
             animation {
                 flightDataIngestion
-                timingCalculator
                 cacheManager
-                flightContextAPI
+                flightInformationAPI
                 flightDataSystem
                 backendServices rideOrchestrationAPI
             }
             autoLayout
-            description "Component diagram showing the simplified internal structure of the Flight Context Service"
-            title "Flight Context Service - Component Diagram"
+            description "Component diagram showing the simplified internal structure of the Flight Information Service"
+            title "Flight Information Service - Component Diagram"
         }
 
         styles {

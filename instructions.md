@@ -2,7 +2,7 @@
 
 Design a scalable, maintainable, and well-structured system that integrates the **redacted** app with a global taxi app to
 enhance the airport journey for travelers. The system should:
-- Provide a simple, intuitive interface for users to manage their airport transportation, within the Priority Pass app and the Taxi app
+- Provide a simple, intuitive interface for users to manage their airport transportation, within the Leisure Lounges app and the Taxi app
 - Display estimated arrival times and recommended departure times based on flight details
 - Enable inventory sharing between the two platforms (e.g., taxi app can surface **redacted** content, and vice versa)
 

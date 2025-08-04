@@ -1,0 +1,82 @@
+@startuml 
+      participant User
+      participant PriorityPassApp as "Leisure Lounges App"
+      participant FlightInformationService as "Flight Information Service"
+      participant TaxiIntegrationService as "Taxi Integration Service"
+      participant TaxiAPI as "Taxi API"
+      participant TaxiApp as "Taxi App"
+      participant NotificationHub as "Notification Hub"
+
+      User->>PriorityPassApp: Open flight details
+      activate PriorityPassApp
+      PriorityPassApp->>PriorityPassApp: GET /members/{member_id}/eligibility
+      PriorityPassApp->>FlightInformationService: Get flight information
+      activate FlightInformationService
+      FlightInformationService->>FlightInformationService: Calculate optimal departure time (Flight arrival - 45min)
+      FlightInformationService-->>PriorityPassApp: Return recommended pickup time
+      deactivate FlightInformationService
+      PriorityPassApp->>PriorityPassApp: GET /airports/{airport_code}/lounges
+      deactivate PriorityPassApp
+
+      User->>PriorityPassApp: Request taxi booking
+      activate PriorityPassApp
+      PriorityPassApp->>TaxiIntegrationService: Initiate ride request
+      activate TaxiIntegrationService
+
+      TaxiIntegrationService->>TaxiAPI: GET /products
+      activate TaxiAPI
+      TaxiAPI-->>TaxiIntegrationService: Available ride products
+      deactivate TaxiAPI
+
+      TaxiIntegrationService->>TaxiAPI: POST /requests/estimate
+      activate TaxiAPI
+      TaxiAPI-->>TaxiIntegrationService: Upfront fare estimate
+      deactivate TaxiAPI
+
+      TaxiIntegrationService-->>PriorityPassApp: Show fare and timing options
+      deactivate TaxiIntegrationService
+      PriorityPassApp-->>User: Display "Book Taxi for [time] (45 min before flight)"
+      deactivate PriorityPassApp
+
+      User->>PriorityPassApp: Confirm booking
+      activate PriorityPassApp
+      PriorityPassApp->>TaxiIntegrationService: Create scheduled ride
+      activate TaxiIntegrationService
+
+      TaxiIntegrationService->>TaxiAPI: POST /requests (with scheduled pickup)
+      activate TaxiAPI
+      TaxiAPI-->>TaxiIntegrationService: Booking reference
+      deactivate TaxiAPI
+
+      TaxiIntegrationService->>PriorityPassApp: Generate deep link with context
+      deactivate TaxiIntegrationService
+      PriorityPassApp->>TaxiApp: Deep link handoff (pickup location + destination)
+      deactivate PriorityPassApp
+
+      TaxiApp->>User: Native Taxi booking completion
+      activate TaxiApp
+      User->>TaxiApp: Complete booking in Taxi app
+
+      TaxiApp->>TaxiAPI: Finalize ride booking
+      activate TaxiAPI
+      TaxiAPI->>NotificationHub: Booking status update
+      activate NotificationHub
+      NotificationHub->>PriorityPassApp: Real-time status update
+      activate PriorityPassApp
+      PriorityPassApp->>User: Show booking confirmation in Leisure Lounges
+      deactivate PriorityPassApp
+      deactivate NotificationHub
+      deactivate TaxiAPI
+      deactivate TaxiApp
+
+      Note over TaxiApp, NotificationHub: Ongoing ride tracking
+      TaxiAPI->>NotificationHub: Driver assigned/En route/Arrived updates
+      activate TaxiAPI
+      activate NotificationHub
+      NotificationHub->>PriorityPassApp: Status updates
+      activate PriorityPassApp
+      PriorityPassApp->>User: Real-time ride status in trip summary
+      deactivate PriorityPassApp
+      deactivate NotificationHub
+      deactivate TaxiAPI
+@enduml
