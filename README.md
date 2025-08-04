@@ -16,8 +16,8 @@ The following solution architecture contains:
 
 #### C4 Diagrams 
 - [Context Diagram](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/SystemContext.png)
-- Container Diagram(https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/ContainerDiagram.png)
-- Component Diagram(https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/FlightContextComponents.png)
+- [Container Diagram](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/ContainerDiagram.png)
+- [Component Diagram](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/c4/FlightContextComponents.png)
 
 #### Sequence Diagrams 
 - [Book Taxi sequence diagram](https://github.com/mattcroxon/taxi-app-case-study/blob/main/docs/diagrams/static_files/sequence/book_taxi_sequence_diagram.png)
