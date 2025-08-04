@@ -4,7 +4,7 @@
 ***This document details the proposed Solution Design to a case study involving a fictitious company 'Leisure Lounge', and third party taxi operators (as detailed [here](./instructions.md))***
 
 The following solution architecture contains: 
-- C4 diagrams, detailing the Context, Container and Component views of the 'Leisure Lounge' travel lounge mobile application, taking requirements specified in the [Case Study](./instructions.md) into consideration.
+- C4 diagrams, detailing the Context, Container and Component views of the 'Leisure Lounge' travel lounge mobile applications
 - OpenAPI specifications for both the LoungePass API, and the Taxi API 
 - Sequence diagrams detailing the interactions to make a taxi booking 
 - Web / mobile application wireframes, detailing the customer journey of adding a Taxi add on services to an Leisure Lounge booking
